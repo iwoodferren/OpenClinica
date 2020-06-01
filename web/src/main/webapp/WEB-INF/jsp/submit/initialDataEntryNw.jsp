@@ -747,13 +747,7 @@ but the custom tag uses that, not this jstl code--%>
 <!--  not the last row -->
 <tr repeat="0" />
 <c:set var="columnNum"  value="1"/>
-	<c:set var="isButtonRemShow" value="true"/>
 <c:forEach var="bodyItem" items="${bodyItemGroup.items}">
-
-
-<c:if test="${groupHasData}">
-	<c:set var="isButtonRemShow" value="false"/>
-	</c:if>
 
 <!-- found show item: <c:out value="${bodyItem.metadata.showItem}"/> -->
 <c:choose>
@@ -863,9 +857,7 @@ but the custom tag uses that, not this jstl code--%>
                     </c:otherwise>
                 </c:choose>
 
-              <c:if test="${isButtonRemShow == true }">
-                         <button stype="remove" type="button" template="<c:out value="${repeatParentId}"/>" class="button_remove" ></button>
-                    </c:if>
+                <button stype="remove" type="button" template="<c:out value="${repeatParentId}"/>" class="button_remove" ></button>
             </td>
 
     </c:if>
@@ -874,14 +866,8 @@ but the custom tag uses that, not this jstl code--%>
 <c:if test="${status.last}">
 <!-- for the last but not the first row and only row, we need to use [] so the repetition javascript can copy it to create new row-->
 <tr id="<c:out value="${repeatParentId}"/>" repeat="template" repeat-start="${repeatNumber}" repeat-max="<c:out value="${repeatMax}"/>" >
-	<c:set var="isButtonRemShow" value="true"/>
     <c:forEach var="bodyItem" items="${bodyItemGroup.items}">
 	<!-- found show item: <c:out value="${bodyItem.metadata.showItem}"/> -->
-
-	<c:if test = "${!empty bodyItem.data}">
-
-	<c:set var="isButtonRemShow" value="false"/>
-	</c:if>
 
 	<c:choose>
     <c:when test="${bodyItem.metadata.showItem}">

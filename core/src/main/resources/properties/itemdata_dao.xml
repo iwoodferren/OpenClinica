@@ -73,6 +73,7 @@
 		<sql>
 			SELECT d.* FROM item_data d, item_form_metadata m
 			WHERE d.item_id = m.item_id AND m.section_id = ? AND d.event_crf_id=?
+			AND d.status_id != 5
 			order by  d.ordinal
 		</sql>
 	</query>

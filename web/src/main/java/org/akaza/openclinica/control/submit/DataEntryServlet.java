@@ -1632,6 +1632,8 @@ public abstract class DataEntryServlet extends CoreSecureController {
                                 success = success && temp;
                             }
                         }
+
+                        //Check for any removed items and remove them
                         for (int j = 0; j < dbGroups.size(); j++) {
                             DisplayItemGroupBean displayGroup = dbGroups.get(j);
                             //JN: Since remove button is gone, the following code can be commented out, however it needs to be tested? Can be tackled when handling discrepancy note w/repeating groups issues.
@@ -3247,42 +3249,41 @@ public abstract class DataEntryServlet extends CoreSecureController {
                     LOGGER.debug("just ran upsert! " + idb.getId());
                 }
 
+           }else if ("remove".equalsIgnoreCase(dib.getEditFlag())) {
+                LOGGER.debug("REMOVE an item data" + idb.getItemId() + idb.getValue());
+                idb.setUpdater(ub);
+                idb.setStatus(Status.DELETED);
+                idb = (ItemDataBean) iddao.updateValueForRemoved(idb);
+
+                DiscrepancyNoteDAO dnDao = new DiscrepancyNoteDAO(getDataSource());
+                List dnNotesOfRemovedItem = dnDao.findExistingNotesForItemData(idb.getId());
+                if (!dnNotesOfRemovedItem.isEmpty()) {
+                    DiscrepancyNoteBean itemParentNote = null;
+                    for (Object obj : dnNotesOfRemovedItem) {
+                        if (((DiscrepancyNoteBean) obj).getParentDnId() == 0) {
+                            itemParentNote = (DiscrepancyNoteBean) obj;
+                        }
+                    }
+                    DiscrepancyNoteBean dnb = new DiscrepancyNoteBean();
+                    if (itemParentNote != null) {
+                        dnb.setParentDnId(itemParentNote.getId());
+                        dnb.setDiscrepancyNoteTypeId(itemParentNote.getDiscrepancyNoteTypeId());
+                    }
+                    dnb.setResolutionStatusId(ResolutionStatus.CLOSED.getId());
+                    dnb.setStudyId(currentStudy.getId());
+                    dnb.setAssignedUserId(ub.getId());
+                    dnb.setOwner(ub);
+                    dnb.setEntityType(DiscrepancyNoteBean.ITEM_DATA);
+                    dnb.setEntityId(idb.getId());
+                    dnb.setCreatedDate(new Date());
+                    dnb.setColumn("value");
+                    dnb.setDescription("The item has been removed, this Discrepancy Note has been Closed.");
+                    dnDao.create(dnb);
+                    dnDao.createMapping(dnb);
+                    itemParentNote.setResolutionStatusId(ResolutionStatus.CLOSED.getId());
+                    dnDao.update(itemParentNote);
+                }
            }
-   //             else if ("remove".equalsIgnoreCase(dib.getEditFlag())) {
-//                LOGGER.debug("REMOVE an item data" + idb.getItemId() + idb.getValue());
-//                idb.setUpdater(ub);
-//                idb.setStatus(Status.DELETED);
-//                idb = (ItemDataBean) iddao.updateValueForRemoved(idb);
-//
-//                DiscrepancyNoteDAO dnDao = new DiscrepancyNoteDAO(getDataSource());
-//                List dnNotesOfRemovedItem = dnDao.findExistingNotesForItemData(idb.getId());
-//                if (!dnNotesOfRemovedItem.isEmpty()) {
-//                    DiscrepancyNoteBean itemParentNote = null;
-//                    for (Object obj : dnNotesOfRemovedItem) {
-//                        if (((DiscrepancyNoteBean) obj).getParentDnId() == 0) {
-//                            itemParentNote = (DiscrepancyNoteBean) obj;
-//                        }
-//                    }
-//                    DiscrepancyNoteBean dnb = new DiscrepancyNoteBean();
-//                    if (itemParentNote != null) {
-//                        dnb.setParentDnId(itemParentNote.getId());
-//                        dnb.setDiscrepancyNoteTypeId(itemParentNote.getDiscrepancyNoteTypeId());
-//                    }
-//                    dnb.setResolutionStatusId(ResolutionStatus.CLOSED.getId());
-//                    dnb.setStudyId(currentStudy.getId());
-//                    dnb.setAssignedUserId(ub.getId());
-//                    dnb.setOwner(ub);
-//                    dnb.setEntityType(DiscrepancyNoteBean.ITEM_DATA);
-//                    dnb.setEntityId(idb.getId());
-//                    dnb.setCreatedDate(new Date());
-//                    dnb.setColumn("value");
-//                    dnb.setDescription("The item has been removed, this Discrepancy Note has been Closed.");
-//                    dnDao.create(dnb);
-//                    dnDao.createMapping(dnb);
-//                    itemParentNote.setResolutionStatusId(ResolutionStatus.CLOSED.getId());
-//                    dnDao.update(itemParentNote);
-//                }
-           // }
 
         }
 
@@ -4514,19 +4515,19 @@ public abstract class DataEntryServlet extends CoreSecureController {
                 boolean hasData = false;
                 int checkAllColumns = 0;
                 if(data.size()>0) hasData=true;
-              //@pgawade 30-May-2012 Fix for issue 13963 - added an extra parameter 'isSubmitted' to method buildMatrixForRepeatingGroups
+
+                //@pgawade 30-May-2012 Fix for issue 13963 - added an extra parameter 'isSubmitted' to method buildMatrixForRepeatingGroups
                 newOne =   buildMatrixForRepeatingGroups(newOne,itemGroup,ecb, sb,itBeans,dataMap, nullValuesList, isSubmitted);
 
-             if (hasData) {
+                if (hasData) {
                  //TODO: fix the group_has_data flag on bean not on session
                     session.setAttribute(GROUP_HAS_DATA, Boolean.TRUE);
 
-                }
-                else {
+                }else {
                     session.setAttribute(GROUP_HAS_DATA, Boolean.FALSE);
                     // no data, still add a blank row for displaying
                     if ( nullValuesList != null && nullValuesList.size() >0){
-                    	LOGGER.trace("set with nullValuesList of : " + nullValuesList);
+                        LOGGER.trace("set with nullValuesList of : " + nullValuesList);
                     }
                     dibs = FormBeanUtil.getDisplayBeansFromItems(itBeans, getDataSource(), ecb, sb.getId(), nullValuesList, getServletContext());
 
@@ -4563,7 +4564,6 @@ public abstract class DataEntryServlet extends CoreSecureController {
     		List<String> nullValuesList, boolean isSubmitted)
     {
 
-        int tempOrdinal = 1;
         ItemDataDAO iddao = new ItemDataDAO(getDataSource(),locale);
         int maxOrdinal = iddao.getMaxOrdinalForGroup(ecb, sb, itemGroup.getItemGroupBean());
         if(maxOrdinal==0)maxOrdinal = 1;//Incase of no data
@@ -4575,6 +4575,8 @@ public abstract class DataEntryServlet extends CoreSecureController {
             List<DisplayItemBean> displayItemBeans = new ArrayList<DisplayItemBean>();
             DisplayItemGroupBean dig = new DisplayItemGroupBean();
 
+            //hold a count for null values for items
+            int numberOfNullItemBeans = 0;
             for(ItemBean itBean:itBeans){
 
                 DisplayItemBean displayItemBean = new DisplayItemBean();
@@ -4589,6 +4591,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
                 }
                 if(itemData==null)
                 {
+                    numberOfNullItemBeans++;
                     itemData = displayItemBean.getData();
                     itemData.setValue("");
                     itemData.setOrdinal(i);
@@ -4613,10 +4616,19 @@ public abstract class DataEntryServlet extends CoreSecureController {
                 displayItemBeans.add(displayItemBean);
 
             }
-            Collections.sort(displayItemBeans);
+            /*Collections.sort(displayItemBeans);
             dig.setItems(displayItemBeans);
             dig.setHasData(groupHasData);
-            itemGroups.add(dig);
+            itemGroups.add(dig);*/
+
+            //Do not add the displayItemBeans if ALL of the ItemBeans are null or empty
+            //so that it's not displayed on the form - Z 31-Mar-2020
+            if(numberOfNullItemBeans != displayItemBeans.size()){
+                Collections.sort(displayItemBeans);
+                dig.setItems(displayItemBeans);
+                dig.setHasData(groupHasData);
+                itemGroups.add(dig);
+            }
         }
 
 
