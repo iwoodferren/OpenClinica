@@ -168,7 +168,6 @@
 				 /*Item data status changed (by removing an event crf)*/
 				SELECT INTO pk NEXTVAL(''audit_log_event_audit_id_seq'');
 				SELECT INTO entity_name_value item.name FROM item WHERE item.item_id = NEW.item_id;
-			
 				/*---------------*/
 				END IF;
 		

@@ -3228,7 +3228,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
                 // idb = (ItemDataBean) iddao.updateValue(idb);
                 // instead of two hits to the db, we perform an 'upsert'
                 // combining them into one
-                idb = (ItemDataBean) iddao.upsert(idb);
+                idb = (ItemDataBean) iddao.upsert(idb); //OC12860 after this the audit_log_event entry is added
                 // <<tbh
             } else if ("edit".equalsIgnoreCase(dib.getEditFlag())) {
                                 idb.setUpdater(ub);
@@ -3252,6 +3252,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
            }else if ("remove".equalsIgnoreCase(dib.getEditFlag())) {
                 LOGGER.debug("REMOVE an item data" + idb.getItemId() + idb.getValue());
                 idb.setUpdater(ub);
+                idb.setOldStatus(idb.getStatus());
                 idb.setStatus(Status.DELETED);
                 idb = (ItemDataBean) iddao.updateValueForRemoved(idb);
 
@@ -4576,7 +4577,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
             DisplayItemGroupBean dig = new DisplayItemGroupBean();
 
             //hold a count for null values for items
-            int numberOfNullItemBeans = 0;
+            //int numberOfNullItemBeans = 0;
             for(ItemBean itBean:itBeans){
 
                 DisplayItemBean displayItemBean = new DisplayItemBean();
@@ -4591,7 +4592,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
                 }
                 if(itemData==null)
                 {
-                    numberOfNullItemBeans++;
+                    //numberOfNullItemBeans++;
                     itemData = displayItemBean.getData();
                     itemData.setValue("");
                     itemData.setOrdinal(i);
@@ -4616,19 +4617,19 @@ public abstract class DataEntryServlet extends CoreSecureController {
                 displayItemBeans.add(displayItemBean);
 
             }
-            /*Collections.sort(displayItemBeans);
+            Collections.sort(displayItemBeans);
             dig.setItems(displayItemBeans);
             dig.setHasData(groupHasData);
-            itemGroups.add(dig);*/
+            itemGroups.add(dig);
 
             //Do not add the displayItemBeans if ALL of the ItemBeans are null or empty
             //so that it's not displayed on the form - Z 31-Mar-2020
-            if(numberOfNullItemBeans != displayItemBeans.size()){
+            /*if(numberOfNullItemBeans != displayItemBeans.size()){
                 Collections.sort(displayItemBeans);
                 dig.setItems(displayItemBeans);
                 dig.setHasData(groupHasData);
                 itemGroups.add(dig);
-            }
+            }*/
         }
 
 
