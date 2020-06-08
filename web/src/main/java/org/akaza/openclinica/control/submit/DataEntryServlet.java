@@ -1592,7 +1592,10 @@ public abstract class DataEntryServlet extends CoreSecureController {
                                 //pulling from dataset instead of database and correcting the flawed logic of using the database ordinals as max ordinal...
                                 nextOrdinal =      displayItem.getData().getOrdinal();
 
-                                temp = writeToDB(displayItem, iddao, nextOrdinal, request);
+                                //do not resubmit remove data
+                                if(displayItem.getData().getStatus().getId() != 5){
+                                    temp = writeToDB(displayItem, iddao, nextOrdinal, request);
+                                }
                                 LOGGER.debug("just executed writeToDB - 1");
                                 LOGGER.debug("next ordinal: " + nextOrdinal);
 
@@ -3252,7 +3255,6 @@ public abstract class DataEntryServlet extends CoreSecureController {
            }else if ("remove".equalsIgnoreCase(dib.getEditFlag())) {
                 LOGGER.debug("REMOVE an item data" + idb.getItemId() + idb.getValue());
                 idb.setUpdater(ub);
-                idb.setOldStatus(idb.getStatus());
                 idb.setStatus(Status.DELETED);
                 idb = (ItemDataBean) iddao.updateValueForRemoved(idb);
 
