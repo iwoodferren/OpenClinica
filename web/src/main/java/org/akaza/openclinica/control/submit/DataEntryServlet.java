@@ -1344,7 +1344,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
                     // do smething here?
                 }
             }
-            LOGGER.debug("errors here: " + errors.toString());
+            LOGGER.info("errors here: " + errors.toString());
             // <<
             logMe("error check  Loop begin  "+System.currentTimeMillis());
             if (errors.isEmpty() && shouldRunRules) {
@@ -2573,6 +2573,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
                 //process the new data of repeating group instances
                 if(i == 0){
                     formGroup = processNewDataInRepeatingGroup(fp, igb, i, dibs, digb, formGroup );
+                    formGroup.setOrdinal(formGroups.size()+1);
                 }else{
                     formGroup = processNewDataInRepeatingGroup(fp, igb, newDataRowOrdinal, dibs, digb, formGroup );
                 }
@@ -2597,6 +2598,26 @@ public abstract class DataEntryServlet extends CoreSecureController {
                     formGroups.add(formGroup);
                 }
                 newDataRowOrdinal++;
+            }else if(i < dbGroups.size()){
+                DisplayItemGroupBean dbGroup = dbGroups.get(i);
+                dbGroup.setOrdinal(formGroups.size()+1);
+                if (!"edit".equalsIgnoreCase(dbGroup.getEditFlag()) && !"initial".equalsIgnoreCase(dbGroup.getEditFlag())) {
+                    // && !"".equalsIgnoreCase(dbGroup.getEditFlag())) {
+                    // >> tbh if the group is not shown, we should not touch it 05/2010
+                    if (dbGroup.getGroupMetaBean().isShowGroup()) {
+                        LOGGER.trace("+++ one row removed, edit flag was " + dbGroup.getEditFlag());
+                        LOGGER.debug("+++ one row removed, edit flag was " + dbGroup.getEditFlag());
+                        dbGroup.setEditFlag("remove");
+                    }
+                    // << tbh
+                }
+
+                dbGroup.setItemGroupBean(digb.getItemGroupBean());
+                dbGroup.setGroupMetaBean(runDynamicsCheck(digb.getGroupMetaBean(), request));
+                dbGroup.setFormInputOrdinal(i);
+                dbGroup.setAuto(false);
+                dbGroup.setInputId(igb.getOid() + "_manual" + i);
+                formGroups.add(dbGroup);
             }
 
         }
@@ -2630,7 +2651,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
                     // display, so need to insert this row, not update
                     if ("initial".equalsIgnoreCase(dbItemGroup.getEditFlag())) {
                         formItemGroup.setEditFlag("add");
-                    } else {
+                    } else if ("edit".equalsIgnoreCase(dbItemGroup.getEditFlag()) || "".equalsIgnoreCase(dbItemGroup.getEditFlag())){
                         dbItemGroup.setEditFlag("edit");
                         // need to set up item data id in order to update
                         for (DisplayItemBean dib : dbItemGroup.getItems()) {
@@ -2665,7 +2686,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
         // initial flag for a row,
         // it means the row is removed on the front-end, so the back-end servlet
         // cannot get it.-jxu
-        for (int i = 0; i < dbGroups.size(); i++) {
+        /*for (int i = 0; i < dbGroups.size(); i++) {
             DisplayItemGroupBean dbItemGroup = dbGroups.get(i);
             LOGGER.trace("+++ found edit flag of " + dbItemGroup.getEditFlag() + " for #" + dbItemGroup.getOrdinal());
             // logger.debug("+++ found edit flag of " + dbItemGroup.getEditFlag() + " for #" + dbItemGroup.getOrdinal() + ": " + i);
@@ -2680,7 +2701,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
                 // << tbh
             }
 
-        }
+        }*/
         LOGGER.debug("+++ about to return form groups: " + formGroups.toString());
         for (int j = 0; j < formGroups.size(); j++) {
             DisplayItemGroupBean formGroup = formGroups.get(j);
