@@ -164,10 +164,11 @@ public class InitialDataEntryServlet extends DataEntryServlet {
             DisplayItemGroupBean displayGroup = formGroups.get(i);
 
             List<DisplayItemBean> items = displayGroup.getItems();
-            int order = displayGroup.getOrdinal();
-            if (displayGroup.isAuto() && displayGroup.getFormInputOrdinal() > 0) {
+            int order = displayGroup.getFormInputOrdinal();
+            //OC12860
+            /*if (displayGroup.isAuto() && displayGroup.getFormInputOrdinal() > 0) {
                 order = displayGroup.getFormInputOrdinal();
-            }
+            }*/
             for (DisplayItemBean displayItem : items) {
                 // int manualcount = 0;
                 // tbh trying to set this correctly 01/2010
@@ -240,10 +241,11 @@ public class InitialDataEntryServlet extends DataEntryServlet {
             DisplayItemGroupBean displayGroup = formGroups.get(i);
 
             List<DisplayItemBean> items = displayGroup.getItems();
-            int order = displayGroup.getOrdinal();
-            if (displayGroup.isAuto() && displayGroup.getFormInputOrdinal() > 0) {
+            int order = displayGroup.getFormInputOrdinal();
+            //OC12860
+            /*if (displayGroup.isAuto() && displayGroup.getFormInputOrdinal() > 0) {
                 order = displayGroup.getFormInputOrdinal();
-            }
+            }*/
             for (DisplayItemBean displayItem : items) {
                 if (displayGroup.isAuto()) {
                     inputName = getGroupItemInputName(displayGroup, order, displayItem);
