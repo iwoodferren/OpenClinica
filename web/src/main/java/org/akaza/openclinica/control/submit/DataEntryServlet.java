@@ -1624,7 +1624,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
                                 }else if(dbItemDataBeanStatus!= null && dbItemDataBeanStatus.getId()!=Status.DELETED.getId()){
                                     //Update data if item is available
                                     temp = writeToDB(displayItem, iddao, nextOrdinal, request);
-                                }else{
+                                }else if(dbItemDataBeanStatus == null){
                                     //Save new data
                                     temp = writeToDB(displayItem, iddao, nextOrdinal, request);
                                 }
@@ -2514,6 +2514,9 @@ public abstract class DataEntryServlet extends CoreSecureController {
 
     /**
      * This methods will create an array of DisplayItemGroupBean, which contains multiple rows for an item group on the data entry form.
+     * This method is where most of the preparation work for adding, updating, and removing item data happens. Note that
+     * processing the first row of item data is special as it can be blank in the form. That's why it has it's own process
+     * for removing and adding data.
      *
      * @param digb
      *            The Item group which has multiple data rows
@@ -2556,7 +2559,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
         repeatMax = ( repeatMax < maxOrdinal)? maxOrdinal:repeatMax;
 
         ////////////////////////////////////////////////////////////////////////////////////////////
-        int manualRows = 1; //counter for rows preexisting data
+        int manualRows = 1; //counter for rows with preexisting data
         int newDataRowOrdinal = 0;  //holds the ordinal of new data
         int existingGroupSize = dbGroups.size(); //Size of existing repeating data retrieved from database
         ////////////////////////////////////////////////////////////////////////////////////////////
@@ -2574,7 +2577,46 @@ public abstract class DataEntryServlet extends CoreSecureController {
             List<DisplayItemBean> dibs = FormBeanUtil.getDisplayBeansFromItems(itBeans, getDataSource(), ecb, sb.getId(), nullValuesList, getServletContext());
 
             //Process preexisting data marked by the word "manual" from the UI
-            if (fp.getStartsWith(igb.getOid() + "_manual" + i + "input")) {
+            if(i==0){//Process the very first item row even if it's blank
+                formGroup = processNewDataInRepeatingGroup(fp, igb, i, dibs, digb, formGroup );
+                if(formGroup!=null){
+                    formGroup.setFormInputOrdinal(i);
+                    formGroup.setOrdinal(formGroups.size()+1);
+                    formGroups.add(formGroup);
+                }else if(dbGroups.get(i)!=null){//first row with existing row is removed
+                    formGroup = new DisplayItemGroupBean();
+                    formGroup.setItemGroupBean(digb.getItemGroupBean());
+                    formGroup.setGroupMetaBean(runDynamicsCheck(digb.getGroupMetaBean(), request));
+
+                    DisplayItemGroupBean dbGroup = dbGroups.get(i);
+                    int dbOrdinal = formGroups.size() + 1;
+                    formGroup.setOrdinal(dbOrdinal);
+                    if (!"edit".equalsIgnoreCase(dbGroup.getEditFlag()) && !"initial".equalsIgnoreCase(dbGroup.getEditFlag())) {
+                        // && !"".equalsIgnoreCase(dbGroup.getEditFlag())) {
+                        // >> tbh if the group is not shown, we should not touch it 05/2010
+                        if (dbGroup.getGroupMetaBean().isShowGroup()) {
+                            LOGGER.trace("+++ one row removed, edit flag was " + dbGroup.getEditFlag());
+                            LOGGER.debug("+++ one row removed, edit flag was " + dbGroup.getEditFlag());
+                            formGroup.setEditFlag("remove");
+                            dbGroup.setEditFlag("remove");
+                        }
+                        // << tbh
+                    }
+
+                    //Setup itemGroup from form for comparison against the database's itemGroup
+                    dibs = processInputForGroupItem(fp, dibs, i, digb, false);
+                    formGroup.setItems(dibs);
+                    formGroup = processDisplayItemGroupBean(formGroup, digb, request, i, igb);
+                    formGroups.add(formGroup);
+                    dbGroup = processDisplayItemGroupBean(dbGroup, digb, request, i, igb);
+
+                    formGroup.setInputId(igb.getOid() + "_" + i);
+                    dbGroup.setInputId(igb.getOid() + "_" + i);
+
+                }
+                newDataRowOrdinal++;
+
+            }else if (fp.getStartsWith(igb.getOid() + "_manual" + i + "input")) {
                 formGroup.setOrdinal(i+1);
                 formGroup.setFormInputOrdinal(i);
                 formGroup.setAuto(false);
@@ -2601,16 +2643,16 @@ public abstract class DataEntryServlet extends CoreSecureController {
                 formGroup.setItems(dibs);
                 formGroups.add(formGroup);
                 manualRows++;
-            } else if (manualRows == existingGroupSize || isNewRepeatingDataPresent(fp, i, igb)){//process new data or the very first row of data
+            } else if (manualRows == existingGroupSize){//process new data or the very first row of data
                 //process the new data of repeating group instances
-                if(i == 0){
+                /*if(i == 0){
                     formGroup = processNewDataInRepeatingGroup(fp, igb, i, dibs, digb, formGroup );
                     formGroup.setFormInputOrdinal(i);
                     formGroup.setOrdinal(formGroups.size()+1);
                     //formGroup.setEditFlag("");
-                }else{
+                }else{*/
                     formGroup = processNewDataInRepeatingGroup(fp, igb, newDataRowOrdinal, dibs, digb, formGroup );
-                }
+                //}
 
                 //this is used to handle removed data rows and set their ordinal correctly
                 //within the remaining data group displayed on the form
@@ -2671,24 +2713,37 @@ public abstract class DataEntryServlet extends CoreSecureController {
                 //Setup itemGroup from form for comparison against the database's itemGroup
                 dibs = processInputForGroupItem(fp, dibs, i, digb, false);
                 formGroup.setItems(dibs);
-                formGroup.setItemGroupBean(digb.getItemGroupBean());
-                formGroup.setGroupMetaBean(runDynamicsCheck(digb.getGroupMetaBean(), request));
-                formGroup.setFormInputOrdinal(i);
-                formGroup.setAuto(false);
-                formGroup.setInputId(igb.getOid() + "_manual" + i);
+                formGroup = processDisplayItemGroupBean(formGroup, digb, request, i, igb);
+//                formGroup.setItemGroupBean(digb.getItemGroupBean());
+//                formGroup.setGroupMetaBean(runDynamicsCheck(digb.getGroupMetaBean(), request));
+//                formGroup.setFormInputOrdinal(i);
+//                formGroup.setAuto(false);
+//                //formGroup.setInputId(igb.getOid() + "_manual" + i);
                 formGroups.add(formGroup);
+//
+//                //setup db's itemGroup for removal.
+//                //The removal operation occurs in this servlet in allItems Loop 2 currently at
+//                //line 970 - Z 10-Jun-2020
+//                dbGroup.setOrdinal(dbOrdinal);
+//                dbGroup.setItemGroupBean(digb.getItemGroupBean());
+//                dbGroup.setGroupMetaBean(runDynamicsCheck(digb.getGroupMetaBean(), request));
+//                dbGroup.setFormInputOrdinal(i);
+//                dbGroup.setAuto(false);
+                //dbGroup.setInputId(igb.getOid() + "_manual" + i);
+                dbGroup = processDisplayItemGroupBean(dbGroup, digb, request, i, igb);
 
-                //setup db's itemGroup for removal.
-                //The removal operation occurs in this servlet in allItems Loop 2 currently at
-                //line 970 - Z 10-Jun-2020
-                dbGroup.setOrdinal(dbOrdinal);
-                dbGroup.setItemGroupBean(digb.getItemGroupBean());
-                dbGroup.setGroupMetaBean(runDynamicsCheck(digb.getGroupMetaBean(), request));
-                dbGroup.setFormInputOrdinal(i);
-                dbGroup.setAuto(false);
-                dbGroup.setInputId(igb.getOid() + "_manual" + i);
+                //set first rows inputID to correct ID
+                //Otherwise, set existing data's inputID
+                /*if(i == 0){
+                    formGroup.setInputId(igb.getOid() + "_" + i);
+                    dbGroup.setInputId(igb.getOid() + "_" + i);
 
-                //ensure matching data ids
+                }else{*/
+                    formGroup.setInputId(igb.getOid() + "_manual" + i);
+                    dbGroup.setInputId(igb.getOid() + "_manual" + i);
+
+                //}
+                manualRows++;
 
             }
 
@@ -5840,5 +5895,16 @@ String tempKey = idb.getItemId()+","+idb.getOrdinal();
             return true;
         }
         return false;
+    }
+
+    private DisplayItemGroupBean processDisplayItemGroupBean(DisplayItemGroupBean formGroup, DisplayItemGroupBean digb, HttpServletRequest request, int i, ItemGroupBean igb){
+
+        formGroup.setItemGroupBean(digb.getItemGroupBean());
+        formGroup.setGroupMetaBean(runDynamicsCheck(digb.getGroupMetaBean(), request));
+        formGroup.setFormInputOrdinal(i);
+        formGroup.setAuto(false);
+        formGroup.setInputId(igb.getOid() + "_manual" + i);
+
+        return formGroup;
     }
 }

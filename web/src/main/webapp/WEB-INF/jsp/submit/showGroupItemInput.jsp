@@ -319,6 +319,16 @@ function switchStr(itemId, id,attribute,str1,str2) {
  <c:set var="isInError" value="${false}" />
  </c:if>
 
+
+  <c:choose>
+    <c:when test="${displayItem.data.status.name == 'removed'}">
+        <c:set var="isRemoved" value="disabled"/>
+    </c:when>
+    <c:otherwise>
+        <c:set var="isRemoved" value=""/>
+    </c:otherwise>
+  </c:choose>
+
  <c:if test="${isInError}">
       <c:set var="errorFlag" value="1"/><!--  use in discrepancy note-->
  </c:if>
@@ -330,24 +340,36 @@ function switchStr(itemId, id,attribute,str1,str2) {
 	<c:choose>
 	<c:when test="${inputTxtValue==null || empty inputTxtValue || isLast}">
 		<div id="div<c:out value="${inputName}"/>" name="myDiv">
-		<c:choose>
-    	<c:when test="${isInError}">
-      		<span class="aka_exclaim_error">! </span><input class="aka_input_error" type="text" id="ft<c:out value="${inputName}"/>" name="fileText<c:out value="${inputName}"/>" disabled class="disabled">
-		</c:when>
-		<c:otherwise>
-			<input type="text" id="ft<c:out value="${inputName}"/>" name="fileText<c:out value="${inputName}"/>" disabled class="disabled">
-		</c:otherwise>
-		</c:choose>
-			<input type="button" id="up<c:out value="${inputName}"/>" name="uploadFile<c:out value="${inputName}"/>" value="<fmt:message key="click_to_upload" bundle="${resword}"/>" onClick="javascript:openDocWindow('UploadFile?submitted=no&itemId=<c:out value="${itemId}"/>&inputName=<c:out value="${inputName}"/>')">
-			<input type="hidden" id="fa<c:out value="${inputName}"/>" name="fileAction<c:out value="${inputName}"/>" value="upload">
+            <c:choose>
+                <c:when test="${isInError}">
+                    <span class="aka_exclaim_error">! </span><input class="aka_input_error" type="text" id="ft<c:out value="${inputName}"/>" name="fileText<c:out value="${inputName}"/>" disabled class="disabled">
+                </c:when>
+                <c:otherwise>
+                    <input type="text" id="ft<c:out value="${inputName}"/>" name="fileText<c:out value="${inputName}"/>" disabled class="disabled">
+                </c:otherwise>
+            </c:choose>
+            <c:choose>
+                <c:when test="${displayItem.data.status.name == 'removed'}">
+                    <input type="button" id="up<c:out value="${inputName}"/>" name="uploadFile<c:out value="${inputName}"/>" value="<fmt:message key="click_to_upload" bundle="${resword}"/>" onClick="javascript:openDocWindow('UploadFile?submitted=no&itemId=<c:out value="${itemId}"/>&inputName=<c:out value="${inputName}"/>')" disabled="disabled">
+                    <input type="hidden" id="fa<c:out value="${inputName}"/>" name="fileAction<c:out value="${inputName}"/>" value="upload" disabled="disabled">
+                </c:when>
+                <c:otherwise>
+                    <input type="button" id="up<c:out value="${inputName}"/>" name="uploadFile<c:out value="${inputName}"/>" value="<fmt:message key="click_to_upload" bundle="${resword}"/>" onClick="javascript:openDocWindow('UploadFile?submitted=no&itemId=<c:out value="${itemId}"/>&inputName=<c:out value="${inputName}"/>')">
+                    <input type="hidden" id="fa<c:out value="${inputName}"/>" name="fileAction<c:out value="${inputName}"/>" value="upload">
+                </c:otherwise>
+			</c:choose>
 		</div>
 		<c:choose>
-		<c:when test="${isLast}">
-        <input type="hidden" id="<c:out value="${inputName}"/>" name="<c:out value="${inputName}"/>" value >
-		</c:when>
-		<c:otherwise>
-        <input type="hidden" id="<c:out value="${inputName}"/>" name="<c:out value="${inputName}"/>" value="<c:out value="${inputTxtValue}"/>">
-		</c:otherwise>
+            <c:when test="${isLast}">
+                <input type="hidden" id="<c:out value="${inputName}"/>" name="<c:out value="${inputName}"/>" value >
+            </c:when>
+            <c:when test="${displayItem.data.status.name == 'removed'}">
+                REMOVED
+                <input type="hidden" id="<c:out value="${inputName}"/>" name="<c:out value="${inputName}"/>" value="<c:out value="${inputTxtValue}"/>" disabled="disabled">
+            </c:when>
+            <c:otherwise>
+                <input type="hidden" id="<c:out value="${inputName}"/>" name="<c:out value="${inputName}"/>" value="<c:out value="${inputTxtValue}"/>">
+            </c:otherwise>
 		</c:choose>
 	</c:when>
 	<c:otherwise>
@@ -364,6 +386,16 @@ function switchStr(itemId, id,attribute,str1,str2) {
 		</div><br>
 		<input id="rp<c:out value="${inputName}"/>" type="button" value="<fmt:message key="replace" bundle="${resword}"/>" onClick="replaceSwitch('<c:out value="${section.eventCRF.id}"/>','<c:out value="${inputName}"/>','rp','value','Replace','Cancel Replace','<c:out value="${inputTxtValue}"/>','<c:out value="${fn:replace(pathAndName,'+','%2B')}"/>','notFound')">
 		<input id="rm<c:out value="${inputName}"/>" type="button" value="<fmt:message key="remove" bundle="${resword}"/>" onClick="removeSwitch('<c:out value="${section.eventCRF.id}"/>','<c:out value="${inputName}"/>','rm','value','Remove','Cancel Remove','<c:out value="${inputTxtValue}"/>','<c:out value="${fn:replace(pathAndName,'+','%2B')}"/>','notFound')">
+		</c:when>
+		<c:when test="${displayItem.data.status.name == 'removed'}">
+		    REMOVED: LINKED DISABLED
+			<c:set var="prefilename" value="${displayItem.data.value}"/>
+            <a id="a<c:out value="${inputName}"/>"><c:out value="${inputTxtValue}"/></a>
+            <input type="hidden" id="hidft<c:out value="${inputName}"/>" name="fileText<c:out value="${inputName}"/>" disabled class="disabled">
+            <input type="hidden" id="hidup<c:out value="${inputName}"/>" name="uploadFile<c:out value="${inputName}"/>" value="<fmt:message key="click_to_upload" bundle="${resword}"/>" onClick="javascript:openDocWindow('UploadFile?submitted=no&itemId=<c:out value="${itemId}"/>&inputName=<c:out value="${inputName}"/>')" disabled="disabled">
+        </div><br>
+        <input id="rp<c:out value="${inputName}"/>" type="button" value="<fmt:message key="replace" bundle="${resword}"/>" onClick="replaceSwitch('<c:out value="${section.eventCRF.id}"/>','<c:out value="${inputName}"/>','rp','value','Replace','Cancel Replace','<c:out value="${inputTxtValue}"/>','<c:out value="${fn:replace(pathAndName,'+','%2B')}"/>','found')" disabled>
+        <input id="rm<c:out value="${inputName}"/>" type="button" value="<fmt:message key="remove" bundle="${resword}"/>" onClick="removeSwitch('<c:out value="${section.eventCRF.id}"/>','<c:out value="${inputName}"/>','rm','value','Remove','Cancel Remove','<c:out value="${inputTxtValue}"/>','<c:out value="${fn:replace(pathAndName,'+','%2B')}"/>','found')" disabled>
 		</c:when>
 		<c:otherwise>
 			<c:set var="prefilename" value="${displayItem.data.value}"/>
@@ -389,6 +421,12 @@ function switchStr(itemId, id,attribute,str1,str2) {
       "this.className='changedField'; manualChange('<c:out value="${inputName}"/>'); javascript:setImageWithTitle('DataStatus_top','images/icon_UnsavedData.gif', '<fmt:message key="changed_not_saved" bundle="${restext}"/>'); javascript:setImageWithTitle('DataStatus_bottom','images/icon_UnsavedData.gif', '<fmt:message key="changed_not_saved" bundle="${restext}"/>');"
       type="text" name="show<c:out value="${inputName}"/>" value="<c:out value="${inputTxtValue}"/>" />
     </c:when>
+    <%--c:when test="${displayItem.data.status.name == 'removed'}">
+        REMOVED
+        <input id="show<c:out value="${inputName}"/>" tabindex="<c:out value="${tabNum}"/>" onChange=
+        "this.className='changedField'; manualChange('<c:out value="${inputName}"/>'); javascript:setImageWithTitle('DataStatus_top','images/icon_UnsavedData.gif','<fmt:message key="changed_not_saved" bundle="${restext}"/>'); javascript:setImageWithTitle('DataStatus_bottom','images/icon_UnsavedData.gif', '<fmt:message key="changed_not_saved" bundle="${restext}"/>');"
+        type="text" name="show<c:out value="${inputName}"/>" value="<c:out value="${inputTxtValue}"/>" disabled="disabled"/>
+    </c:when--%>
     <c:otherwise>
       <input id="show<c:out value="${inputName}"/>" tabindex="<c:out value="${tabNum}"/>" onChange=
         "this.className='changedField'; manualChange('<c:out value="${inputName}"/>'); javascript:setImageWithTitle('DataStatus_top','images/icon_UnsavedData.gif','<fmt:message key="changed_not_saved" bundle="${restext}"/>'); javascript:setImageWithTitle('DataStatus_bottom','images/icon_UnsavedData.gif', '<fmt:message key="changed_not_saved" bundle="${restext}"/>');"
@@ -405,10 +443,10 @@ function switchStr(itemId, id,attribute,str1,str2) {
       <span class="aka_exclaim_error">! </span><input class="aka_input_error" id="<c:out value="${inputName}"/>" tabindex="<c:out value="${tabNum}"/>"
       onChange="this.className='changedField';sameRepGrpInstant('<c:out value="${inputName}"/>', '<c:out value="${itemId}"/>', '<c:out value="${displayItem.instantFrontStrGroup.sameRepGrpFrontStr.frontStr}" />', '<c:out value="${displayItem.instantFrontStrGroup.sameRepGrpFrontStr.frontStrDelimiter.code}" />'); javascript:setImageWithTitle('DataStatus_top','images/icon_UnsavedData.gif', '<fmt:message key="changed_not_saved" bundle="${restext}"/>'); javascript:setImageWithTitle('DataStatus_bottom','images/icon_UnsavedData.gif', '<fmt:message key="changed_not_saved" bundle="${restext}"/>');" type="text" name="<c:out value="${inputName}"/>" value="<c:out value="${inputTxtValue}"/>" />
     </c:when>
-    <c:when test="${displayItem.data.status.name == 'removed'}">
+    <%--c:when test="${displayItem.data.status.name == 'removed'}">
       REMOVED<input id="<c:out value="${inputName}"/>" tabindex="<c:out value="${tabNum}"/>"
       onChange="this.className='changedField';sameRepGrpInstant('<c:out value="${inputName}"/>', '<c:out value="${itemId}"/>', '<c:out value="${displayItem.instantFrontStrGroup.sameRepGrpFrontStr.frontStr}" />', '<c:out value="${displayItem.instantFrontStrGroup.sameRepGrpFrontStr.frontStrDelimiter.code}" />'); javascript:setImageWithTitle('DataStatus_top','images/icon_UnsavedData.gif', '<fmt:message key="changed_not_saved" bundle="${restext}"/>'); javascript:setImageWithTitle('DataStatus_bottom','images/icon_UnsavedData.gif', '<fmt:message key="changed_not_saved" bundle="${restext}"/>');" type="text" name="<c:out value="${inputName}"/>" value="<c:out value="${inputTxtValue}"/>" disabled="disabled"/>
-    </c:when>
+    </c:when--%>
     <c:otherwise>
       <input id="<c:out value="${inputName}"/>" tabindex="<c:out value="${tabNum}"/>" onChange=
         "this.className='changedField'; sameRepGrpInstant('<c:out value="${inputName}"/>', '<c:out value="${itemId}"/>', '<c:out value="${displayItem.instantFrontStrGroup.sameRepGrpFrontStr.frontStr}" />', '<c:out value="${displayItem.instantFrontStrGroup.sameRepGrpFrontStr.frontStrDelimiter.code}" />');javascript:setImageWithTitle('DataStatus_top','images/icon_UnsavedData.gif', '<fmt:message key="changed_not_saved" bundle="${restext}"/>'); javascript:setImageWithTitle('DataStatus_bottom','images/icon_UnsavedData.gif', '<fmt:message key="changed_not_saved" bundle="${restext}"/>');" type="text" name="<c:out value="${inputName}"/>" value="<c:out value="${inputTxtValue}"/>" />
@@ -455,7 +493,6 @@ function switchStr(itemId, id,attribute,str1,str2) {
 </c:otherwise>
 </c:choose>
  <input type="hidden" id="defValue<c:out value="${inputName}"/>" name="defValue<c:out value="${inputName}"/>" value="<c:out value="${defValuesForCheckBox}"/>"/>
-
   <c:if test="${! isHorizontal}">
     <c:forEach var="option" items="${displayItem.metadata.responseSet.options}">
       <c:choose>
@@ -475,10 +512,15 @@ function switchStr(itemId, id,attribute,str1,str2) {
           <span class="aka_exclaim_error">! </span><input class="aka_input_error" id="<c:out value="${inputName}"/>" tabindex="<c:out value="${tabNum}"/>"
           onChange="this.className='changedField';sameRepGrpInstant('<c:out value="${inputName}"/>', '<c:out value="${itemId}"/>', '<c:out value="${displayItem.instantFrontStrGroup.sameRepGrpFrontStr.frontStr}" />', '<c:out value="${displayItem.instantFrontStrGroup.sameRepGrpFrontStr.frontStrDelimiter.code}" />'); setImage('DataStatus_top','images/icon_UnsavedData.gif'); javascript:setImageWithTitle('DataStatus_bottom','images/icon_UnsavedData.gif', '<fmt:message key="changed_not_saved" bundle="${restext}"/>');" type="checkbox" name="<c:out value="${inputName}"/>" value="<c:out value="${option.value}" />" <c:out value="${checked}"/> /> <c:out value="${option.text}" /> <br/>
         </c:when>
+        <%--c:when test="${displayItem.data.status.name == 'removed'}">
+            <input disabled="<c:out value="${isRemoved}"/>" id="<c:out value="${inputName}"/>"
+              tabindex="<c:out value="${tabNum}"/>"
+              onChange="this.className='changedField'; sameRepGrpInstant('<c:out value="${inputName}"/>', '<c:out value="${itemId}"/>', '<c:out value="${displayItem.instantFrontStrGroup.sameRepGrpFrontStr.frontStr}" />', '<c:out value="${displayItem.instantFrontStrGroup.sameRepGrpFrontStr.frontStrDelimiter.code}" />');setImage('DataStatus_top','images/icon_UnsavedData.gif'); javascript:setImageWithTitle('DataStatus_bottom','images/icon_UnsavedData.gif', '<fmt:message key="changed_not_saved" bundle="${restext}"/>');" type="checkbox" name="<c:out value="${inputName}"/>" value="<c:out value="${option.value}" />" <c:out value="${checked}"/>/> <c:out value="${option.text}" /> <br/>
+        </c:when--%>
         <c:otherwise>
-          <input id="<c:out value="${inputName}"/>" 
+          <input disabled="<c:out value="${isRemoved}"/>" id="<c:out value="${inputName}"/>"
 		  tabindex="<c:out value="${tabNum}"/>" 
-		  onChange="this.className='changedField'; sameRepGrpInstant('<c:out value="${inputName}"/>', '<c:out value="${itemId}"/>', '<c:out value="${displayItem.instantFrontStrGroup.sameRepGrpFrontStr.frontStr}" />', '<c:out value="${displayItem.instantFrontStrGroup.sameRepGrpFrontStr.frontStrDelimiter.code}" />');setImage('DataStatus_top','images/icon_UnsavedData.gif'); javascript:setImageWithTitle('DataStatus_bottom','images/icon_UnsavedData.gif', '<fmt:message key="changed_not_saved" bundle="${restext}"/>');" type="checkbox" name="<c:out value="${inputName}"/>" value="<c:out value="${option.value}" />" <c:out value="${checked}"/> /> <c:out value="${option.text}" /> <br/>
+		  onChange="this.className='changedField'; sameRepGrpInstant('<c:out value="${inputName}"/>', '<c:out value="${itemId}"/>', '<c:out value="${displayItem.instantFrontStrGroup.sameRepGrpFrontStr.frontStr}" />', '<c:out value="${displayItem.instantFrontStrGroup.sameRepGrpFrontStr.frontStrDelimiter.code}" />');setImage('DataStatus_top','images/icon_UnsavedData.gif'); javascript:setImageWithTitle('DataStatus_bottom','images/icon_UnsavedData.gif', '<fmt:message key="changed_not_saved" bundle="${restext}"/>');" type="checkbox" name="<c:out value="${inputName}"/>" value="<c:out value="${option.value}" />" <c:out value="${checked}"/>/> <c:out value="${option.text}" /> <br/>
        </c:otherwise>
       </c:choose>
     </c:forEach>
@@ -503,7 +545,7 @@ function switchStr(itemId, id,attribute,str1,str2) {
         onChange="this.className='changedField';sameRepGrpInstant('<c:out value="${inputName}"/>', '<c:out value="${itemId}"/>', '<c:out value="${displayItem.instantFrontStrGroup.sameRepGrpFrontStr.frontStr}" />', '<c:out value="${displayItem.instantFrontStrGroup.sameRepGrpFrontStr.frontStrDelimiter.code}" />'); setImage('DataStatus_top','images/icon_UnsavedData.gif'); javascript:setImageWithTitle('DataStatus_bottom','images/icon_UnsavedData.gif', '<fmt:message key="changed_not_saved" bundle="${restext}"/>');" type="checkbox" name="<c:out value="${inputName}"/>" value="<c:out value="${responseOptionBean.value}" />" <c:out value="${checked}"/> />
       </c:when>
       <c:otherwise>
-        <input id="<c:out value="${inputName}"/>" tabindex="<c:out value="${tabNum}"/>"
+        <input disabled="<c:out value="${isRemoved}"/>" id="<c:out value="${inputName}"/>" tabindex="<c:out value="${tabNum}"/>"
         onChange="this.className='changedField';sameRepGrpInstant('<c:out value="${inputName}"/>', '<c:out value="${itemId}"/>', '<c:out value="${displayItem.instantFrontStrGroup.sameRepGrpFrontStr.frontStr}" />', '<c:out value="${displayItem.instantFrontStrGroup.sameRepGrpFrontStr.frontStrDelimiter.code}" />'); setImage('DataStatus_top','images/icon_UnsavedData.gif'); javascript:setImageWithTitle('DataStatus_bottom','images/icon_UnsavedData.gif', '<fmt:message key="changed_not_saved" bundle="${restext}"/>');" type="checkbox" name="<c:out value="${inputName}"/>" value="<c:out value="${responseOptionBean.value}" />" <c:out value="${checked}"/> />
       </c:otherwise>
     </c:choose>
