@@ -443,10 +443,10 @@ function switchStr(itemId, id,attribute,str1,str2) {
       <span class="aka_exclaim_error">! </span><input class="aka_input_error" id="<c:out value="${inputName}"/>" tabindex="<c:out value="${tabNum}"/>"
       onChange="this.className='changedField';sameRepGrpInstant('<c:out value="${inputName}"/>', '<c:out value="${itemId}"/>', '<c:out value="${displayItem.instantFrontStrGroup.sameRepGrpFrontStr.frontStr}" />', '<c:out value="${displayItem.instantFrontStrGroup.sameRepGrpFrontStr.frontStrDelimiter.code}" />'); javascript:setImageWithTitle('DataStatus_top','images/icon_UnsavedData.gif', '<fmt:message key="changed_not_saved" bundle="${restext}"/>'); javascript:setImageWithTitle('DataStatus_bottom','images/icon_UnsavedData.gif', '<fmt:message key="changed_not_saved" bundle="${restext}"/>');" type="text" name="<c:out value="${inputName}"/>" value="<c:out value="${inputTxtValue}"/>" />
     </c:when>
-    <%--c:when test="${displayItem.data.status.name == 'removed'}">
+    <c:when test="${displayItem.data.status.name == 'removed'}">
       REMOVED<input id="<c:out value="${inputName}"/>" tabindex="<c:out value="${tabNum}"/>"
       onChange="this.className='changedField';sameRepGrpInstant('<c:out value="${inputName}"/>', '<c:out value="${itemId}"/>', '<c:out value="${displayItem.instantFrontStrGroup.sameRepGrpFrontStr.frontStr}" />', '<c:out value="${displayItem.instantFrontStrGroup.sameRepGrpFrontStr.frontStrDelimiter.code}" />'); javascript:setImageWithTitle('DataStatus_top','images/icon_UnsavedData.gif', '<fmt:message key="changed_not_saved" bundle="${restext}"/>'); javascript:setImageWithTitle('DataStatus_bottom','images/icon_UnsavedData.gif', '<fmt:message key="changed_not_saved" bundle="${restext}"/>');" type="text" name="<c:out value="${inputName}"/>" value="<c:out value="${inputTxtValue}"/>" disabled="disabled"/>
-    </c:when--%>
+    </c:when>
     <c:otherwise>
       <input id="<c:out value="${inputName}"/>" tabindex="<c:out value="${tabNum}"/>" onChange=
         "this.className='changedField'; sameRepGrpInstant('<c:out value="${inputName}"/>', '<c:out value="${itemId}"/>', '<c:out value="${displayItem.instantFrontStrGroup.sameRepGrpFrontStr.frontStr}" />', '<c:out value="${displayItem.instantFrontStrGroup.sameRepGrpFrontStr.frontStrDelimiter.code}" />');javascript:setImageWithTitle('DataStatus_top','images/icon_UnsavedData.gif', '<fmt:message key="changed_not_saved" bundle="${restext}"/>'); javascript:setImageWithTitle('DataStatus_bottom','images/icon_UnsavedData.gif', '<fmt:message key="changed_not_saved" bundle="${restext}"/>');" type="text" name="<c:out value="${inputName}"/>" value="<c:out value="${inputTxtValue}"/>" />
@@ -512,13 +512,13 @@ function switchStr(itemId, id,attribute,str1,str2) {
           <span class="aka_exclaim_error">! </span><input class="aka_input_error" id="<c:out value="${inputName}"/>" tabindex="<c:out value="${tabNum}"/>"
           onChange="this.className='changedField';sameRepGrpInstant('<c:out value="${inputName}"/>', '<c:out value="${itemId}"/>', '<c:out value="${displayItem.instantFrontStrGroup.sameRepGrpFrontStr.frontStr}" />', '<c:out value="${displayItem.instantFrontStrGroup.sameRepGrpFrontStr.frontStrDelimiter.code}" />'); setImage('DataStatus_top','images/icon_UnsavedData.gif'); javascript:setImageWithTitle('DataStatus_bottom','images/icon_UnsavedData.gif', '<fmt:message key="changed_not_saved" bundle="${restext}"/>');" type="checkbox" name="<c:out value="${inputName}"/>" value="<c:out value="${option.value}" />" <c:out value="${checked}"/> /> <c:out value="${option.text}" /> <br/>
         </c:when>
-        <%--c:when test="${displayItem.data.status.name == 'removed'}">
+        <c:when test="${displayItem.data.status.name == 'removed'}">
             <input disabled="<c:out value="${isRemoved}"/>" id="<c:out value="${inputName}"/>"
               tabindex="<c:out value="${tabNum}"/>"
               onChange="this.className='changedField'; sameRepGrpInstant('<c:out value="${inputName}"/>', '<c:out value="${itemId}"/>', '<c:out value="${displayItem.instantFrontStrGroup.sameRepGrpFrontStr.frontStr}" />', '<c:out value="${displayItem.instantFrontStrGroup.sameRepGrpFrontStr.frontStrDelimiter.code}" />');setImage('DataStatus_top','images/icon_UnsavedData.gif'); javascript:setImageWithTitle('DataStatus_bottom','images/icon_UnsavedData.gif', '<fmt:message key="changed_not_saved" bundle="${restext}"/>');" type="checkbox" name="<c:out value="${inputName}"/>" value="<c:out value="${option.value}" />" <c:out value="${checked}"/>/> <c:out value="${option.text}" /> <br/>
-        </c:when--%>
+        </c:when>
         <c:otherwise>
-          <input disabled="<c:out value="${isRemoved}"/>" id="<c:out value="${inputName}"/>"
+          <input id="<c:out value="${inputName}"/>"
 		  tabindex="<c:out value="${tabNum}"/>" 
 		  onChange="this.className='changedField'; sameRepGrpInstant('<c:out value="${inputName}"/>', '<c:out value="${itemId}"/>', '<c:out value="${displayItem.instantFrontStrGroup.sameRepGrpFrontStr.frontStr}" />', '<c:out value="${displayItem.instantFrontStrGroup.sameRepGrpFrontStr.frontStrDelimiter.code}" />');setImage('DataStatus_top','images/icon_UnsavedData.gif'); javascript:setImageWithTitle('DataStatus_bottom','images/icon_UnsavedData.gif', '<fmt:message key="changed_not_saved" bundle="${restext}"/>');" type="checkbox" name="<c:out value="${inputName}"/>" value="<c:out value="${option.value}" />" <c:out value="${checked}"/>/> <c:out value="${option.text}" /> <br/>
        </c:otherwise>
@@ -542,6 +542,10 @@ function switchStr(itemId, id,attribute,str1,str2) {
     <c:choose>
       <c:when test="${isInError}">
         <span class="aka_exclaim_error">! </span><input class="aka_input_error" id="<c:out value="${inputName}"/>" tabindex="<c:out value="${tabNum}"/>"
+        onChange="this.className='changedField';sameRepGrpInstant('<c:out value="${inputName}"/>', '<c:out value="${itemId}"/>', '<c:out value="${displayItem.instantFrontStrGroup.sameRepGrpFrontStr.frontStr}" />', '<c:out value="${displayItem.instantFrontStrGroup.sameRepGrpFrontStr.frontStrDelimiter.code}" />'); setImage('DataStatus_top','images/icon_UnsavedData.gif'); javascript:setImageWithTitle('DataStatus_bottom','images/icon_UnsavedData.gif', '<fmt:message key="changed_not_saved" bundle="${restext}"/>');" type="checkbox" name="<c:out value="${inputName}"/>" value="<c:out value="${responseOptionBean.value}" />" <c:out value="${checked}"/> />
+      </c:when>
+      <c:when test="${displayItem.data.status.name == 'removed'}">
+        <input disabled="<c:out value="${isRemoved}"/>" id="<c:out value="${inputName}"/>" tabindex="<c:out value="${tabNum}"/>"
         onChange="this.className='changedField';sameRepGrpInstant('<c:out value="${inputName}"/>', '<c:out value="${itemId}"/>', '<c:out value="${displayItem.instantFrontStrGroup.sameRepGrpFrontStr.frontStr}" />', '<c:out value="${displayItem.instantFrontStrGroup.sameRepGrpFrontStr.frontStrDelimiter.code}" />'); setImage('DataStatus_top','images/icon_UnsavedData.gif'); javascript:setImageWithTitle('DataStatus_bottom','images/icon_UnsavedData.gif', '<fmt:message key="changed_not_saved" bundle="${restext}"/>');" type="checkbox" name="<c:out value="${inputName}"/>" value="<c:out value="${responseOptionBean.value}" />" <c:out value="${checked}"/> />
       </c:when>
       <c:otherwise>
