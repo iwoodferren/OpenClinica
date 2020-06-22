@@ -319,16 +319,6 @@ function switchStr(itemId, id,attribute,str1,str2) {
  <c:set var="isInError" value="${false}" />
  </c:if>
 
-
-  <c:choose>
-    <c:when test="${displayItem.data.status.name == 'removed'}">
-        <c:set var="isRemoved" value="disabled"/>
-    </c:when>
-    <c:otherwise>
-        <c:set var="isRemoved" value=""/>
-    </c:otherwise>
-  </c:choose>
-
  <c:if test="${isInError}">
       <c:set var="errorFlag" value="1"/><!--  use in discrepancy note-->
  </c:if>
@@ -453,15 +443,27 @@ function switchStr(itemId, id,attribute,str1,str2) {
     </c:otherwise>
   </c:choose>
   <c:if test="${displayItem.item.itemDataTypeId==9 || displayItem.item.itemDataTypeId==10}"><!-- date type-->
-    <A HREF="#"
-       onmouseover="Calendar.setup({inputField  : getSib(this.previousSibling), ifFormat    : '<fmt:message key="date_format_calender" bundle="${resformat}"/>', button      : 'anchor<c:out value="${inputName}"/>' });"
-       NAME="anchor<c:out value="${inputName}"/>"
-       ID="anchor<c:out value="${inputName}"/>">
-        <img src="images/bt_Calendar.gif" alt="<fmt:message key="show_calendar" bundle="${resword}"/>" title="<fmt:message key="show_calendar" bundle="${resword}"/>" border="0"/>
+    <c:choose>
+        <c:when test="${displayItem.data.status.name == 'removed'}">
+            <A>
+                <img src="images/bt_Calendar.gif" alt="<fmt:message key="show_calendar" bundle="${resword}"/>" title="<fmt:message key="show_calendar" bundle="${resword}"/>" border="0"/>
 
-    </a>
-    <%-- TODO l10n for the above line? --%>
-    <c:set var="numOfDate" value="${numOfDate+1}"/>
+            </a>
+            <%-- TODO l10n for the above line? --%>
+            <c:set var="numOfDate" value="${numOfDate+1}"/>
+        </c:when>
+        <c:otherwise>
+            <A HREF="#"
+               onmouseover="Calendar.setup({inputField  : getSib(this.previousSibling), ifFormat    : '<fmt:message key="date_format_calender" bundle="${resformat}"/>', button      : 'anchor<c:out value="${inputName}"/>' });"
+               NAME="anchor<c:out value="${inputName}"/>"
+               ID="anchor<c:out value="${inputName}"/>">
+                <img src="images/bt_Calendar.gif" alt="<fmt:message key="show_calendar" bundle="${resword}"/>" title="<fmt:message key="show_calendar" bundle="${resword}"/>" border="0"/>
+
+            </a>
+            <%-- TODO l10n for the above line? --%>
+            <c:set var="numOfDate" value="${numOfDate+1}"/>
+        </c:otherwise>
+    </c:choose>
   </c:if>
 </c:if>
 <c:if test='${inputType == "textarea"}'>
@@ -471,6 +473,10 @@ function switchStr(itemId, id,attribute,str1,str2) {
     <c:when test="${isInError}">
       <span class="aka_exclaim_error">! </span><textarea class="aka_input_error" id="<c:out value="${inputName}"/>" tabindex="<c:out value="${tabNum}"/>"
       onChange="this.className='changedField'; sameRepGrpInstant('<c:out value="${inputName}"/>', '<c:out value="${itemId}"/>', '<c:out value="${displayItem.instantFrontStrGroup.sameRepGrpFrontStr.frontStr}" />', '<c:out value="${displayItem.instantFrontStrGroup.sameRepGrpFrontStr.frontStrDelimiter.code}" />'); javascript:setImageWithTitle('DataStatus_top','images/icon_UnsavedData.gif', '<fmt:message key="changed_not_saved" bundle="${restext}"/>'); javascript:setImageWithTitle('DataStatus_bottom','images/icon_UnsavedData.gif', '<fmt:message key="changed_not_saved" bundle="${restext}"/>');" name="<c:out value="${inputName}"/>" rows="5" cols="40"><c:out value="${inputTxtValue}"/></textarea>
+    </c:when>
+    <c:when test="${displayItem.data.status.name == 'removed'}">
+      <textarea id="<c:out value="${inputName}"/>" tabindex="<c:out value="${tabNum}"/>" title="<c:out value="${defValue}"/>"
+      onChange="this.className='changedField';sameRepGrpInstant('<c:out value="${inputName}"/>', '<c:out value="${itemId}"/>', '<c:out value="${displayItem.instantFrontStrGroup.sameRepGrpFrontStr.frontStr}" />', '<c:out value="${displayItem.instantFrontStrGroup.sameRepGrpFrontStr.frontStrDelimiter.code}" />'); javascript:setImageWithTitle('DataStatus_top','images/icon_UnsavedData.gif', '<fmt:message key="changed_not_saved" bundle="${restext}"/>'); javascript:setImageWithTitle('DataStatus_bottom','images/icon_UnsavedData.gif', '<fmt:message key="changed_not_saved" bundle="${restext}"/>');" name="<c:out value="${inputName}"/>" rows="5" cols="40"><c:out value="${inputTxtValue}"/></textarea>
     </c:when>
     <c:otherwise>
       <textarea id="<c:out value="${inputName}"/>" tabindex="<c:out value="${tabNum}"/>" title="<c:out value="${defValue}"/>"
@@ -513,7 +519,7 @@ function switchStr(itemId, id,attribute,str1,str2) {
           onChange="this.className='changedField';sameRepGrpInstant('<c:out value="${inputName}"/>', '<c:out value="${itemId}"/>', '<c:out value="${displayItem.instantFrontStrGroup.sameRepGrpFrontStr.frontStr}" />', '<c:out value="${displayItem.instantFrontStrGroup.sameRepGrpFrontStr.frontStrDelimiter.code}" />'); setImage('DataStatus_top','images/icon_UnsavedData.gif'); javascript:setImageWithTitle('DataStatus_bottom','images/icon_UnsavedData.gif', '<fmt:message key="changed_not_saved" bundle="${restext}"/>');" type="checkbox" name="<c:out value="${inputName}"/>" value="<c:out value="${option.value}" />" <c:out value="${checked}"/> /> <c:out value="${option.text}" /> <br/>
         </c:when>
         <c:when test="${displayItem.data.status.name == 'removed'}">
-            <input disabled="<c:out value="${isRemoved}"/>" id="<c:out value="${inputName}"/>"
+            REMOVED<input disabled="<c:out value="${isRemoved}"/>" id="<c:out value="${inputName}"/>"
               tabindex="<c:out value="${tabNum}"/>"
               onChange="this.className='changedField'; sameRepGrpInstant('<c:out value="${inputName}"/>', '<c:out value="${itemId}"/>', '<c:out value="${displayItem.instantFrontStrGroup.sameRepGrpFrontStr.frontStr}" />', '<c:out value="${displayItem.instantFrontStrGroup.sameRepGrpFrontStr.frontStrDelimiter.code}" />');setImage('DataStatus_top','images/icon_UnsavedData.gif'); javascript:setImageWithTitle('DataStatus_bottom','images/icon_UnsavedData.gif', '<fmt:message key="changed_not_saved" bundle="${restext}"/>');" type="checkbox" name="<c:out value="${inputName}"/>" value="<c:out value="${option.value}" />" <c:out value="${checked}"/>/> <c:out value="${option.text}" /> <br/>
         </c:when>
@@ -545,11 +551,11 @@ function switchStr(itemId, id,attribute,str1,str2) {
         onChange="this.className='changedField';sameRepGrpInstant('<c:out value="${inputName}"/>', '<c:out value="${itemId}"/>', '<c:out value="${displayItem.instantFrontStrGroup.sameRepGrpFrontStr.frontStr}" />', '<c:out value="${displayItem.instantFrontStrGroup.sameRepGrpFrontStr.frontStrDelimiter.code}" />'); setImage('DataStatus_top','images/icon_UnsavedData.gif'); javascript:setImageWithTitle('DataStatus_bottom','images/icon_UnsavedData.gif', '<fmt:message key="changed_not_saved" bundle="${restext}"/>');" type="checkbox" name="<c:out value="${inputName}"/>" value="<c:out value="${responseOptionBean.value}" />" <c:out value="${checked}"/> />
       </c:when>
       <c:when test="${displayItem.data.status.name == 'removed'}">
-        <input disabled="<c:out value="${isRemoved}"/>" id="<c:out value="${inputName}"/>" tabindex="<c:out value="${tabNum}"/>"
+        REMOVED<input disabled id="<c:out value="${inputName}"/>" tabindex="<c:out value="${tabNum}"/>"
         onChange="this.className='changedField';sameRepGrpInstant('<c:out value="${inputName}"/>', '<c:out value="${itemId}"/>', '<c:out value="${displayItem.instantFrontStrGroup.sameRepGrpFrontStr.frontStr}" />', '<c:out value="${displayItem.instantFrontStrGroup.sameRepGrpFrontStr.frontStrDelimiter.code}" />'); setImage('DataStatus_top','images/icon_UnsavedData.gif'); javascript:setImageWithTitle('DataStatus_bottom','images/icon_UnsavedData.gif', '<fmt:message key="changed_not_saved" bundle="${restext}"/>');" type="checkbox" name="<c:out value="${inputName}"/>" value="<c:out value="${responseOptionBean.value}" />" <c:out value="${checked}"/> />
       </c:when>
       <c:otherwise>
-        <input disabled="<c:out value="${isRemoved}"/>" id="<c:out value="${inputName}"/>" tabindex="<c:out value="${tabNum}"/>"
+        <input id="<c:out value="${inputName}"/>" tabindex="<c:out value="${tabNum}"/>"
         onChange="this.className='changedField';sameRepGrpInstant('<c:out value="${inputName}"/>', '<c:out value="${itemId}"/>', '<c:out value="${displayItem.instantFrontStrGroup.sameRepGrpFrontStr.frontStr}" />', '<c:out value="${displayItem.instantFrontStrGroup.sameRepGrpFrontStr.frontStrDelimiter.code}" />'); setImage('DataStatus_top','images/icon_UnsavedData.gif'); javascript:setImageWithTitle('DataStatus_bottom','images/icon_UnsavedData.gif', '<fmt:message key="changed_not_saved" bundle="${restext}"/>');" type="checkbox" name="<c:out value="${inputName}"/>" value="<c:out value="${responseOptionBean.value}" />" <c:out value="${checked}"/> />
       </c:otherwise>
     </c:choose>
@@ -572,6 +578,10 @@ function switchStr(itemId, id,attribute,str1,str2) {
           <span class="aka_exclaim_error">! </span><input class="aka_input_error" id="<c:out value="${inputName}"/>" tabindex="<c:out value="${tabNum}"/>" onclick="if(detectIEWindows(navigator.userAgent)){this.checked=true; unCheckSiblings(this,'vertical');}"
           onChange="if(! detectIEWindows(navigator.userAgent)){this.className='changedField';}sameRepGrpInstant('<c:out value="${inputName}"/>', '<c:out value="${itemId}"/>', '<c:out value="${displayItem.instantFrontStrGroup.sameRepGrpFrontStr.frontStr}" />', '<c:out value="${displayItem.instantFrontStrGroup.sameRepGrpFrontStr.frontStrDelimiter.code}" />'); javascript:setImageWithTitle('DataStatus_top','images/icon_UnsavedData.gif', '<fmt:message key="changed_not_saved" bundle="${restext}"/>'); javascript:setImageWithTitle('DataStatus_bottom','images/icon_UnsavedData.gif', '<fmt:message key="changed_not_saved" bundle="${restext}"/>');" type="radio" name="<c:out value="${inputName}"/>" value="<c:out value="${option.value}" />" <c:out value="${checked}"/> /><c:if test="${! isHorizontal}"><c:out value="${option.text}" /></c:if> <br/>
         </c:when>
+        <c:when test="${displayItem.data.status.name == 'removed'}">
+          REMOVED<input disabled id="<c:out value="${inputName}"/>" tabindex="<c:out value="${tabNum}"/>"
+          onChange="if(! detectIEWindows(navigator.userAgent)){this.className='changedField';}sameRepGrpInstant('<c:out value="${inputName}"/>', '<c:out value="${itemId}"/>', '<c:out value="${displayItem.instantFrontStrGroup.sameRepGrpFrontStr.frontStr}" />', '<c:out value="${displayItem.instantFrontStrGroup.sameRepGrpFrontStr.frontStrDelimiter.code}" />'); javascript:setImageWithTitle('DataStatus_top','images/icon_UnsavedData.gif', '<fmt:message key="changed_not_saved" bundle="${restext}"/>'); javascript:setImageWithTitle('DataStatus_bottom','images/icon_UnsavedData.gif', '<fmt:message key="changed_not_saved" bundle="${restext}"/>');" onclick="if(detectIEWindows(navigator.userAgent)){this.checked=true; unCheckSiblings(this,'vertical');}" type="radio" name="<c:out value="${inputName}"/>" value="<c:out value="${option.value}" />" <c:out value="${checked}"/> /> <c:if test="${! isHorizontal}"><c:out value="${option.text}" /></c:if> <br/>
+        </c:when>
         <c:otherwise>
           <input id="<c:out value="${inputName}"/>" tabindex="<c:out value="${tabNum}"/>"
           onChange="if(! detectIEWindows(navigator.userAgent)){this.className='changedField';}sameRepGrpInstant('<c:out value="${inputName}"/>', '<c:out value="${itemId}"/>', '<c:out value="${displayItem.instantFrontStrGroup.sameRepGrpFrontStr.frontStr}" />', '<c:out value="${displayItem.instantFrontStrGroup.sameRepGrpFrontStr.frontStrDelimiter.code}" />'); javascript:setImageWithTitle('DataStatus_top','images/icon_UnsavedData.gif', '<fmt:message key="changed_not_saved" bundle="${restext}"/>'); javascript:setImageWithTitle('DataStatus_bottom','images/icon_UnsavedData.gif', '<fmt:message key="changed_not_saved" bundle="${restext}"/>');" onclick="if(detectIEWindows(navigator.userAgent)){this.checked=true; unCheckSiblings(this,'vertical');}" type="radio" name="<c:out value="${inputName}"/>" value="<c:out value="${option.value}" />" <c:out value="${checked}"/> /> <c:if test="${! isHorizontal}"><c:out value="${option.text}" /></c:if> <br/>
@@ -593,6 +603,10 @@ function switchStr(itemId, id,attribute,str1,str2) {
         <span class="aka_exclaim_error">! </span><input class="aka_input_error" id="<c:out value="${inputName}"/>" tabindex="<c:out value="${tabNum}"/>" onclick="if(detectIEWindows(navigator.userAgent)){this.checked=true; unCheckSiblings(this,'horizontal');}"
         onChange="if(! detectIEWindows(navigator.userAgent)){this.className='changedField';}sameRepGrpInstant('<c:out value="${inputName}"/>', '<c:out value="${itemId}"/>', '<c:out value="${displayItem.instantFrontStrGroup.sameRepGrpFrontStr.frontStr}" />', '<c:out value="${displayItem.instantFrontStrGroup.sameRepGrpFrontStr.frontStrDelimiter.code}" />'); javascript:setImageWithTitle('DataStatus_top','images/icon_UnsavedData.gif', '<fmt:message key="changed_not_saved" bundle="${restext}"/>'); javascript:setImageWithTitle('DataStatus_bottom','images/icon_UnsavedData.gif', '<fmt:message key="changed_not_saved" bundle="${restext}"/>');" type="radio" name="<c:out value="${inputName}"/>" value="<c:out value="${responseOptionBean.value}" />" <c:out value="${checked}"/> />
       </c:when>
+        <c:when test="${displayItem.data.status.name == 'removed'}">
+            REMOVED<input disabled id="<c:out value="${inputName}"/>" tabindex="<c:out value="${tabNum}"/>" onclick="if(detectIEWindows(navigator.userAgent)){this.checked=true; unCheckSiblings(this,'horizontal');}"
+            onChange="if(! detectIEWindows(navigator.userAgent)){this.className='changedField';}sameRepGrpInstant('<c:out value="${inputName}"/>', '<c:out value="${itemId}"/>', '<c:out value="${displayItem.instantFrontStrGroup.sameRepGrpFrontStr.frontStr}" />', '<c:out value="${displayItem.instantFrontStrGroup.sameRepGrpFrontStr.frontStrDelimiter.code}" />'); javascript:setImageWithTitle('DataStatus_top','images/icon_UnsavedData.gif', '<fmt:message key="changed_not_saved" bundle="${restext}"/>'); javascript:setImageWithTitle('DataStatus_bottom','images/icon_UnsavedData.gif', '<fmt:message key="changed_not_saved" bundle="${restext}"/>');" type="radio" name="<c:out value="${inputName}"/>" value="<c:out value="${responseOptionBean.value}" />" <c:out value="${checked}"/> />
+        </c:when>
       <c:otherwise>
         <input id="<c:out value="${inputName}"/>" tabindex="<c:out value="${tabNum}"/>" onclick="if(detectIEWindows(navigator.userAgent)){this.checked=true; unCheckSiblings(this,'horizontal');}"
         onChange="if(! detectIEWindows(navigator.userAgent)){this.className='changedField';}sameRepGrpInstant('<c:out value="${inputName}"/>', '<c:out value="${itemId}"/>', '<c:out value="${displayItem.instantFrontStrGroup.sameRepGrpFrontStr.frontStr}" />', '<c:out value="${displayItem.instantFrontStrGroup.sameRepGrpFrontStr.frontStrDelimiter.code}" />'); javascript:setImageWithTitle('DataStatus_top','images/icon_UnsavedData.gif', '<fmt:message key="changed_not_saved" bundle="${restext}"/>'); javascript:setImageWithTitle('DataStatus_bottom','images/icon_UnsavedData.gif', '<fmt:message key="changed_not_saved" bundle="${restext}"/>');" type="radio" name="<c:out value="${inputName}"/>" value="<c:out value="${responseOptionBean.value}" />" <c:out value="${checked}"/> />
@@ -631,25 +645,67 @@ include the default value first in the select list --%>
     <c:when test="${isInError}">
       <span class="aka_exclaim_error">! </span>
       <select class="aka_input_error" id="<c:out value="${inputName}"/>" tabindex="<c:out value="${tabNum}"/>"
-      onChange="this.className='changedField'; sameRepGrpInstant('<c:out value="${inputName}"/>', '<c:out value="${itemId}"/>', '<c:out value="${displayItem.instantFrontStrGroup.sameRepGrpFrontStr.frontStr}" />', '<c:out value="${displayItem.instantFrontStrGroup.sameRepGrpFrontStr.frontStrDelimiter.code}" />'); javascript:setImageWithTitle('DataStatus_top','images/icon_UnsavedData.gif', '<fmt:message key="changed_not_saved" bundle="${restext}"/>'); javascript:setImageWithTitle('DataStatus_bottom','images/icon_UnsavedData.gif', '<fmt:message key="changed_not_saved" bundle="${restext}"/>');" name="<c:out value="${inputName}"/>" class="formfield">
+        onChange="this.className='changedField'; sameRepGrpInstant('<c:out value="${inputName}"/>', '<c:out value="${itemId}"/>', '<c:out value="${displayItem.instantFrontStrGroup.sameRepGrpFrontStr.frontStr}" />', '<c:out value="${displayItem.instantFrontStrGroup.sameRepGrpFrontStr.frontStrDelimiter.code}" />'); javascript:setImageWithTitle('DataStatus_top','images/icon_UnsavedData.gif', '<fmt:message key="changed_not_saved" bundle="${restext}"/>'); javascript:setImageWithTitle('DataStatus_bottom','images/icon_UnsavedData.gif', '<fmt:message key="changed_not_saved" bundle="${restext}"/>');" name="<c:out value="${inputName}"/>" class="formfield">
          
         <c:if test="${printDefaultFirst}">
              <option value="<c:out value="" />" selected="selected"
                             <c:out value=""/> ><c:out value="${displayItem.metadata.defaultValue}" />
              </option>
           </c:if>
-    <c:forEach var="option" items="${displayItem.metadata.responseSet.options}">
-                <option value="<c:out value="${option.value}" />"
-                        <c:if test="${option.selected}"> selected="selected"</c:if>>
-                    <c:out value="${option.text}" />
-                </option>
+        <c:forEach var="option" items="${displayItem.metadata.responseSet.options}">
+                    <option value="<c:out value="${option.value}" />"
+                            <c:if test="${option.selected}"> selected="selected"</c:if>>
+                        <c:out value="${option.text}" />
+                    </option>
+            <c:set var="count" value="${count+1}"/>
+        </c:forEach>
+      </select>
+    </c:when>
+
+    <c:when test="${displayItem.data.status.name == 'removed'}">
+      <c:set var="selectedOption" value="-1"/>
+      <c:set var="count" value="0"/>
+      <c:forEach var="option" items="${displayItem.metadata.responseSet.options}">
+        <c:if test="${option.selected}"><c:set var="selectedOption" value="${count}" /></c:if>
+        <c:if test="${printDefault=='true'}">
+          <c:if test="${displayItem.metadata.defaultValue == option.text || displayItem.metadata.defaultValue == option.value}">
+            <c:set var="printDefault" value="false"/>
+            <c:if test="${selectedOption==-1}"><c:set var="selectedOption" value="${count}"/></c:if>
+          </c:if>
+        </c:if>
         <c:set var="count" value="${count+1}"/>
-    </c:forEach>
+      </c:forEach>
+      REMOVED<select disabled id="<c:out value="${inputName}"/>" tabindex="<c:out value="${tabNum}"/>"
+      onChange="this.className='changedField';sameRepGrpInstant('<c:out value="${inputName}"/>', '<c:out value="${itemId}"/>', '<c:out value="${displayItem.instantFrontStrGroup.sameRepGrpFrontStr.frontStr}" />', '<c:out value="${displayItem.instantFrontStrGroup.sameRepGrpFrontStr.frontStrDelimiter.code}" />'); javascript:setImageWithTitle('DataStatus_top','images/icon_UnsavedData.gif', '<fmt:message key="changed_not_saved" bundle="${restext}"/>'); javascript:setImageWithTitle('DataStatus_bottom','images/icon_UnsavedData.gif', '<fmt:message key="changed_not_saved" bundle="${restext}"/>');" name="<c:out value="${inputName}"/>" class="formfield">
+        <c:choose>
+          <c:when test="${printDefault == 'true'}">
+            <c:set var="count" value="0"/>
+            <option value="<c:out value="" />" <c:out value=""/> ><c:out value="${displayItem.metadata.defaultValue}" /></option>
+            <c:forEach var="option" items="${displayItem.metadata.responseSet.options}">
+              <c:choose>
+                <c:when test="${count==selectedOption}"><c:set var="checked" value="selected" /></c:when>
+                <c:otherwise><c:set var="checked" value="" /></c:otherwise>
+              </c:choose>
+              <option value="<c:out value="${option.value}" />" <c:out value="${checked}"/> ><c:out value="${option.text}" /></option>
+              <c:set var="count" value="${count+1}"/>
+            </c:forEach>
+          </c:when>
+          <c:otherwise>
+            <c:set var="count" value="0"/>
+            <c:forEach var="option" items="${displayItem.metadata.responseSet.options}">
+              <c:choose>
+                <c:when test="${count==selectedOption}"><c:set var="checked" value="selected" /></c:when>
+                <c:otherwise><c:set var="checked" value="" /></c:otherwise>
+              </c:choose>
+              <option value="<c:out value="${option.value}" />" <c:out value="${checked}"/> ><c:out value="${option.text}" /></option>
+              <c:set var="count" value="${count+1}"/>
+            </c:forEach>
+          </c:otherwise>
+        </c:choose>
       </select>
     </c:when>
 
     <c:otherwise>
-
       <c:set var="selectedOption" value="-1"/>
       <c:set var="count" value="0"/>
       <c:forEach var="option" items="${displayItem.metadata.responseSet.options}">
@@ -700,6 +756,11 @@ include the default value first in the select list --%>
   <c:choose>
     <c:when test="${isInError}">
       <span class="aka_exclaim_error">! </span><select  class="aka_input_error" id="<c:out value="${inputName}"/>" multiple  tabindex=
+      "<c:out value="${tabNum}"/>" name="<c:out value="${inputName}"/>"
+      onChange="this.className='changedField';sameRepGrpInstant('<c:out value="${inputName}"/>', '<c:out value="${itemId}"/>', '<c:out value="${displayItem.instantFrontStrGroup.sameRepGrpFrontStr.frontStr}" />', '<c:out value="${displayItem.instantFrontStrGroup.sameRepGrpFrontStr.frontStrDelimiter.code}" />'); javascript:setImageWithTitle('DataStatus_top','images/icon_UnsavedData.gif', '<fmt:message key="changed_not_saved" bundle="${restext}"/>'); javascript:setImageWithTitle('DataStatus_bottom','images/icon_UnsavedData.gif', '<fmt:message key="changed_not_saved" bundle="${restext}"/>');">
+    </c:when>
+    <c:when test="${displayItem.data.status.name == 'removed'}">
+      REMOVED<select disabled id="<c:out value="${inputName}"/>" multiple  tabindex=
       "<c:out value="${tabNum}"/>" name="<c:out value="${inputName}"/>"
       onChange="this.className='changedField';sameRepGrpInstant('<c:out value="${inputName}"/>', '<c:out value="${itemId}"/>', '<c:out value="${displayItem.instantFrontStrGroup.sameRepGrpFrontStr.frontStr}" />', '<c:out value="${displayItem.instantFrontStrGroup.sameRepGrpFrontStr.frontStrDelimiter.code}" />'); javascript:setImageWithTitle('DataStatus_top','images/icon_UnsavedData.gif', '<fmt:message key="changed_not_saved" bundle="${restext}"/>'); javascript:setImageWithTitle('DataStatus_bottom','images/icon_UnsavedData.gif', '<fmt:message key="changed_not_saved" bundle="${restext}"/>');">
     </c:when>
@@ -795,25 +856,33 @@ include the default value first in the select list --%>
 				<c:when test="${isInError}">
       				<span class="aka_exclaim_error">! </span><input class="aka_input_error" id="<c:out value="${inputName}"/>" tabindex="<c:out value="${tabNum}"/>" onChange="this.className='changedField'; javascript:setImageWithTitle('DataStatus_top','images/icon_UnsavedData.gif', '<fmt:message key="changed_not_saved" bundle="${restext}"/>'); javascript:setImageWithTitle('DataStatus_bottom','images/icon_UnsavedData.gif', '<fmt:message key="changed_not_saved" bundle="${restext}"/>');" type="text" class="disabled" disabled="disabled" name="<c:out value="${inputName}"/>" value="<c:out value="${displayItem.metadata.responseSet.value}"/>" />
 				</c:when>
+		        <c:when test="${displayItem.data.status.name == 'removed'}">
+                    <c:choose>
+                       <c:when test="${isNewItem eq true }">
+                           REMOVED<input disabled id="<c:out value="${inputName}"/>" tabindex="<c:out value="${tabNum}"/>" onChange=
+                           "this.className='changedField'; javascript:setImageWithTitle('DataStatus_top','images/icon_UnsavedData.gif', '<fmt:message key="changed_not_saved" bundle="${restext}"/>'); javascript:setImageWithTitle('DataStatus_bottom','images/icon_UnsavedData.gif', '<fmt:message key="changed_not_saved" bundle="${restext}"/>');" type="text" class="disabled" disabled="disabled" name="<c:out value="${inputName}"/>" value="" />
+
+                       </c:when>
+                       <c:otherwise>
+                           REMOVED<input disabled id="<c:out value="${inputName}"/>" tabindex="<c:out value="${tabNum}"/>" onChange=
+                               "this.className='changedField'; javascript:setImageWithTitle('DataStatus_top','images/icon_UnsavedData.gif', '<fmt:message key="changed_not_saved" bundle="${restext}"/>'); javascript:setImageWithTitle('DataStatus_bottom','images/icon_UnsavedData.gif', '<fmt:message key="changed_not_saved" bundle="${restext}"/>');" type="text" class="disabled" disabled="disabled" name="<c:out value="${inputName}"/>" value="<c:out value="${displayItem.metadata.responseSet.value}"/>" />
+                       </c:otherwise>
+                   </c:choose>
+                </c:when>
 				<c:otherwise>
 				<%-- new row should be empty --%>
-				<c:choose>
-					<c:when test="${isNewItem eq true }">
-							<input id="<c:out value="${inputName}"/>" tabindex="<c:out value="${tabNum}"/>" onChange=
-							"this.className='changedField'; javascript:setImageWithTitle('DataStatus_top','images/icon_UnsavedData.gif', '<fmt:message key="changed_not_saved" bundle="${restext}"/>'); javascript:setImageWithTitle('DataStatus_bottom','images/icon_UnsavedData.gif', '<fmt:message key="changed_not_saved" bundle="${restext}"/>');" type="text" class="disabled" disabled="disabled" name="<c:out value="${inputName}"/>" value="" />
-    		
-					</c:when>
-				
-					<c:otherwise>
-					
-						<input id="<c:out value="${inputName}"/>" tabindex="<c:out value="${tabNum}"/>" onChange=
-							"this.className='changedField'; javascript:setImageWithTitle('DataStatus_top','images/icon_UnsavedData.gif', '<fmt:message key="changed_not_saved" bundle="${restext}"/>'); javascript:setImageWithTitle('DataStatus_bottom','images/icon_UnsavedData.gif', '<fmt:message key="changed_not_saved" bundle="${restext}"/>');" type="text" class="disabled" disabled="disabled" name="<c:out value="${inputName}"/>" value="<c:out value="${displayItem.metadata.responseSet.value}"/>" />
-    		</c:otherwise>
-					</c:choose>
-				
-				
-				
-					</c:otherwise>
+                    <c:choose>
+                        <c:when test="${isNewItem eq true }">
+                            <input id="<c:out value="${inputName}"/>" tabindex="<c:out value="${tabNum}"/>" onChange=
+                            "this.className='changedField'; javascript:setImageWithTitle('DataStatus_top','images/icon_UnsavedData.gif', '<fmt:message key="changed_not_saved" bundle="${restext}"/>'); javascript:setImageWithTitle('DataStatus_bottom','images/icon_UnsavedData.gif', '<fmt:message key="changed_not_saved" bundle="${restext}"/>');" type="text" class="disabled" disabled="disabled" name="<c:out value="${inputName}"/>" value="" />
+
+                        </c:when>
+                        <c:otherwise>
+                            <input id="<c:out value="${inputName}"/>" tabindex="<c:out value="${tabNum}"/>" onChange=
+                                "this.className='changedField'; javascript:setImageWithTitle('DataStatus_top','images/icon_UnsavedData.gif', '<fmt:message key="changed_not_saved" bundle="${restext}"/>'); javascript:setImageWithTitle('DataStatus_bottom','images/icon_UnsavedData.gif', '<fmt:message key="changed_not_saved" bundle="${restext}"/>');" type="text" class="disabled" disabled="disabled" name="<c:out value="${inputName}"/>" value="<c:out value="${displayItem.metadata.responseSet.value}"/>" />
+                        </c:otherwise>
+                    </c:choose>
+				</c:otherwise>
 			</c:choose>
 		</c:otherwise>
 	</c:choose>
