@@ -40,6 +40,20 @@
         <security:http pattern="/pages/api/v1/forms/migrate/**" security="none"/>
         <security:http pattern="/pages/auth/api/**" security="none"/>
         <security:http pattern="/pages/auth/api/v1/system/**" security="none"/>
+        <security:http pattern="/oauth/authorize" create-session="stateless"
+              xmlns="http://www.springframework.org/schema/security">
+            <intercept-url pattern="/oauth/authorize" access="IS_AUTHENTICATED_FULLY"/>
+            <form-login/>
+        </security:http>
+
+        <security:http pattern="/oauth/token" create-session="stateless"
+              authentication-manager-ref="clientAuthenticationManager"
+              xmlns="http://www.springframework.org/schema/security">
+            <intercept-url pattern="/oauth/token" access="IS_AUTHENTICATED_FULLY"/>
+            <anonymous enabled="false"/>
+            <http-basic entry-point-ref="clientAuthenticationEntryPoint"/>
+            <custom-filter ref="clientCredentialsTokenEndpointFilter" after="BASIC_AUTH_FILTER"/>
+        </security:http>
 
     <security:http access-denied-page="/accounts/denied.htm" entry-point-ref="authenticationProcessingFilterEntryPoint">
 
@@ -149,6 +163,28 @@
         <property name="clientDetailsService" ref="clientDetails" />
     </bean>
 
+    <bean id="clientCredentialsTokenEndpointFilter"
+          class="org.springframework.security.oauth2.provider.client.ClientCredentialsTokenEndpointFilter">
+        <property name="authenticationManager" ref="clientAuthenticationManager"/>
+    </bean>
+
+    <authentication-manager id="clientAuthenticationManager"
+                            xmlns="http://www.springframework.org/schema/security">
+        <authentication-provider user-service-ref="clientDetailsUserService"/>
+    </authentication-manager>
+
+    <!--This may need to be changed as the class package may have changed-->
+    <bean id="clientDetailsUserService"
+          class="org.springframework.security.oauth2.provider.client.ClientDetailsUserDetailsService">
+        <constructor-arg ref="clientDetails"/>
+    </bean>
+
+    <bean id="clientAuthenticationEntryPoint"
+          class="org.springframework.security.oauth2.provider.error.OAuth2AuthenticationEntryPoint">
+        <property name="realmName" value="oauth"/>
+        <property name="typeName" value="Basic"/>
+    </bean>
+
     <!-- Token management -->
     <oauth:authorization-server client-details-service-ref="clientDetails" token-services-ref="tokenServices"
                                 user-approval-handler-ref="userApprovalHandler">
@@ -159,12 +195,19 @@
         <oauth:password/>
     </oauth:authorization-server>
 
+    <oauth:resource-server id="resourceServerFilter"
+                           resource-id="clientDetails" token-services-ref="tokenServices" />
+
     <!-- Client Definition -->
     <!-- https://stackoverflow.com/questions/41817798/spring-security-oauth2-post-restriction -->
     <oauth:client-details-service id="clientDetails">
         <oauth:client client-id="my-trusted-client" authorized-grant-types="password,authorization_code,refresh_token"/>
         <oauth:client client-id="my-less-trusted-client" authorized-grant-types="authorization_code"/>
-        <oauth:client client-id="designer" authorized-grant-types="authorization_code,refresh_token"/>
+        <oauth:client client-id="designer"
+                      secret="myClientSecret011"
+                      scope="read,write"
+                      authorities="ROLE_USER"
+                      authorized-grant-types="authorization_code,refresh_token"/>
     </oauth:client-details-service>
     
     
