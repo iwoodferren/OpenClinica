@@ -50,22 +50,22 @@
 <!--&lt;!&ndash;        <custom-filter ref="myFilter" before="PRE_AUTH_FILTER" />&ndash;&gt;-->
 <!--&lt;!&ndash;        <http-basic authentication-details-source-ref="myFilter"/>&ndash;&gt;-->
 <!--    </security:http>-->
-    <security:http pattern="/oauth/authorize" create-session="stateless"
-                   xmlns="http://www.springframework.org/schema/security">
-        <intercept-url pattern="/oauth/authorize" access="IS_AUTHENTICATED_FULLY"/>
-        <form-login/>
-<!--        <http-basic entry-point-ref="oauthAuthenticationEntryPoint"/>-->
-<!--        <custom-filter ref="resourceServerFilter" before="PRE_AUTH_FILTER" />-->
-    </security:http>
+<!--    <security:http pattern="/oauth2/authorize" create-session="stateless"-->
+<!--                   xmlns="http://www.springframework.org/schema/security">-->
+<!--        <intercept-url pattern="/oauth2/authorize" access="IS_AUTHENTICATED_FULLY"/>-->
+<!--        <form-login/>-->
+<!--&lt;!&ndash;        <http-basic entry-point-ref="oauthAuthenticationEntryPoint"/>&ndash;&gt;-->
+<!--&lt;!&ndash;        <custom-filter ref="resourceServerFilter" before="PRE_AUTH_FILTER" />&ndash;&gt;-->
+<!--    </security:http>-->
 
-    <security:http pattern="/oauth/token" create-session="stateless"
-          authentication-manager-ref="clientAuthenticationManager"
-          xmlns="http://www.springframework.org/schema/security">
-        <intercept-url pattern="/oauth/token" access="ROLE_CLIENT"/>
-        <anonymous enabled="false"/>
-        <http-basic entry-point-ref="clientAuthenticationEntryPoint"/>
-        <custom-filter ref="clientCredentialsTokenEndpointFilter" after="BASIC_AUTH_FILTER"/>
-    </security:http>
+<!--    <security:http pattern="/oauth2/token" create-session="stateless"-->
+<!--          authentication-manager-ref="clientAuthenticationManager"-->
+<!--          xmlns="http://www.springframework.org/schema/security">-->
+<!--        <intercept-url pattern="/oauth2/token" access="IS_AUTHENTICATED_FULLY"/>-->
+<!--        <anonymous enabled="false"/>-->
+<!--        <http-basic entry-point-ref="clientAuthenticationEntryPoint"/>-->
+<!--        <custom-filter ref="clientCredentialsTokenEndpointFilter" after="BASIC_AUTH_FILTER"/>-->
+<!--    </security:http>-->
 
 <!--    <security:http pattern="/oauth/(users|clients)/.*" request-matcher="regex"-->
 <!--          create-session="stateless" entry-point-ref="oauthAuthenticationEntryPoint"-->
