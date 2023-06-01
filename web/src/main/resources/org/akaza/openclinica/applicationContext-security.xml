@@ -257,7 +257,7 @@
                       authorized-grant-types="password,authorization_code,refresh_token"/>
         <oauth:client client-id="my-less-trusted-client"
                       authorized-grant-types="authorization_code"/>
-        <oauth:client client-id="ocInstance"
+        <oauth:client client-id="designer"
                       secret="myClientSecret011"
                       scope="read,write,trust"
                       authorized-grant-types="authorization_code,refresh_token,implicit"/>
