@@ -12,6 +12,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.akaza.openclinica.bean.odmbeans.AuditLogBean;
 import org.akaza.openclinica.bean.odmbeans.AuditLogsBean;
@@ -35,6 +37,7 @@ import org.apache.commons.lang3.StringEscapeUtils;
 
 public class ClinicalDataReportBean extends OdmXmlReportBean {
     private OdmClinicalDataBean clinicalData;
+    private Pattern pattern;
 
     private boolean includeDOB = true;
     public void setIncludeDOB(boolean includeDOB) {
@@ -47,6 +50,8 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
     public ClinicalDataReportBean(OdmClinicalDataBean clinicaldata) {
         super();
         this.clinicalData = clinicaldata;
+        String regex = "[\\p{C}]";
+        this.pattern = Pattern.compile(regex);
     }
 
     /**
@@ -197,8 +202,9 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
                                 }
                             } 
                             if(printValue) {
+                                Matcher matcher = this.pattern.matcher(item.getValue());
                                 Boolean hasElm = false;
-                                xml.append("Value=\"" + StringEscapeUtils.escapeXml11(item.getValue()) + "\"");
+                                xml.append("Value=\"" + StringEscapeUtils.escapeXml11(matcher.replaceAll("&nbsp;")) + "\"");
 
                                 String muRefOid = item.getMeasurementUnitRef().getElementDefOID();
                                 if (muRefOid != null && muRefOid.length() > 0) {
@@ -385,10 +391,12 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
                     xml.append(currentIndent + "                      ReasonForChange=\"" + StringEscapeUtils.escapeXml11(r) + "\" ");
                 }
                 if (o.length() > 0) {
-                	xml.append(currentIndent + "                      OldValue=\"" + StringEscapeUtils.escapeXml11(o) + "\" ");
+                    Matcher matcher = pattern.matcher(o);
+                	xml.append(currentIndent + "                      OldValue=\"" + StringEscapeUtils.escapeXml11(matcher.replaceAll("&nbsp;")) + "\" ");
                 }
                 if (n.length() > 0) {
-                	xml.append(currentIndent + "                      NewValue=\"" + StringEscapeUtils.escapeXml11(n) + "\"");
+                    Matcher matcher = pattern.matcher(n);
+                	xml.append(currentIndent + "                      NewValue=\"" + StringEscapeUtils.escapeXml11(matcher.replaceAll("&nbsp;")) + "\"");
                 }
                 if (vt.length() > 0) {
                     xml.append(nls);
@@ -513,8 +521,9 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
                 }
                 if (cn.getDetailedNote() != null) {
                     String nt = cn.getDetailedNote();
+                    Matcher matcher = pattern.matcher(nt);
                     if (nt.length() > 0) {
-                        xml.append(currentIndent + indent + indent + "<OpenClinica:DetailedNote>" + StringEscapeUtils.escapeXml11(nt)
+                        xml.append(currentIndent + indent + indent + "<OpenClinica:DetailedNote>" + StringEscapeUtils.escapeXml11(matcher.replaceAll("&nbsp;"))
                             + "</OpenClinica:DetailedNote>");
                         xml.append(nls);
                     }
