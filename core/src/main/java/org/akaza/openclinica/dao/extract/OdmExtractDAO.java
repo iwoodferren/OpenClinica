@@ -3250,7 +3250,7 @@ private void fetchItemGroupMetaData(MetaDataVersionBean metadata,String cvIds, S
         + " and edc.status_id not in (5,7) and edc.crf_id = crf.crf_id and crf.status_id not in (5,7) and crf.crf_id = cv.crf_id and (cv.status_id not in (5,7))"
         + " and exists (select ifm.crf_version_id from item_form_metadata ifm, item_group_metadata igm"
         + " where cv.crf_version_id = ifm.crf_version_id and cv.crf_version_id = igm.crf_version_id and ifm.item_id = igm.item_id)"
-        + " order by sed.ordinal, edc.ordinal, edc.crf_id, cv.crf_version_id desc";
+        + " order by sed.ordinal, sed.oc_oid, edc.ordinal, edc.crf_id, cv.crf_version_id desc";
     }
 
     
